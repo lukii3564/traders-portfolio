@@ -52,6 +52,26 @@ const counterObserver = new IntersectionObserver(entries => {
 
 counters.forEach(counter => counterObserver.observe(counter));
 
+const eatTime = document.getElementById("eatTime");
+
+if (eatTime) {
+    const updateEatTime = () => {
+        const currentEatTime = new Intl.DateTimeFormat("en-GB", {
+            timeZone: "Africa/Nairobi",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false
+        }).format(new Date());
+
+        eatTime.textContent = currentEatTime;
+        eatTime.dateTime = currentEatTime;
+    };
+
+    updateEatTime();
+    setInterval(updateEatTime, 1000);
+}
+
 const navbar = document.getElementById("navbar");
 
 window.addEventListener("scroll", () => {
