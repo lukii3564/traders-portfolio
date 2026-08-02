@@ -13,6 +13,39 @@ document.querySelectorAll(".hero-left,.hero-right").forEach(el => {
     observer.observe(el);
 });
 
+const typeOnScroll = document.querySelectorAll(".type-on-scroll");
+
+const typeWriterObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+
+        const paragraph = entry.target;
+        const message = paragraph.textContent.replace(/\s+/g, " ").trim();
+        const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        if (prefersReducedMotion) {
+            paragraph.textContent = message;
+        } else {
+            paragraph.textContent = "";
+            paragraph.classList.add("is-typing");
+            let index = 0;
+            const typeNextCharacter = () => {
+                paragraph.textContent += message.charAt(index++);
+                if (index < message.length) {
+                    setTimeout(typeNextCharacter, 13);
+                } else {
+                    paragraph.classList.remove("is-typing");
+                }
+            };
+            typeNextCharacter();
+        }
+
+        typeWriterObserver.unobserve(paragraph);
+    });
+}, { threshold: 0.45 });
+
+typeOnScroll.forEach(paragraph => typeWriterObserver.observe(paragraph));
+
 const glow1 = document.querySelector(".glow1");
 const glow2 = document.querySelector(".glow2");
 
@@ -139,4 +172,70 @@ document.querySelectorAll(".nav-links a").forEach(link => {
         navLinks.classList.remove("active");
         menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
     });
+});
+
+const equityLine = document.getElementById("equityLine");
+const equityArea = document.getElementById("equityArea");
+const equityDot = document.getElementById("equityDot");
+const equityReturn = document.getElementById("equityReturn");
+
+if (equityLine && equityArea && equityDot && equityReturn) {
+    const chartData = {
+        "1M": { points: [132, 129, 136, 121, 126, 110, 115, 100, 105, 87, 78], return: "+6.7%" },
+        "3M": { points: [182, 170, 175, 151, 159, 129, 136, 112, 117, 82, 68], return: "+18.4%" },
+        "6M": { points: [205, 191, 198, 174, 180, 154, 165, 136, 143, 110, 121, 91, 97, 62], return: "+42.8%" }
+    };
+
+    const drawEquityChart = range => {
+        const points = chartData[range].points;
+        const step = 640 / (points.length - 1);
+        const line = points.map((y, index) => `${index ? "L" : "M"}${(index * step).toFixed(1)},${y}`).join(" ");
+        const lastX = ((points.length - 1) * step).toFixed(1);
+
+        equityLine.setAttribute("d", line);
+        equityArea.setAttribute("d", `${line} L${lastX},235 L0,235 Z`);
+        equityDot.setAttribute("cx", lastX);
+        equityDot.setAttribute("cy", points[points.length - 1]);
+        equityReturn.textContent = chartData[range].return;
+    };
+
+    drawEquityChart("3M");
+    document.querySelectorAll(".chart-range button").forEach(button => {
+        button.addEventListener("click", () => {
+            document.querySelectorAll(".chart-range button").forEach(item => item.classList.remove("active"));
+            button.classList.add("active");
+            drawEquityChart(button.dataset.range);
+        });
+    });
+}
+
+const tradeToggle = document.querySelector(".trade-toggle");
+const tradeProofCard = document.querySelector(".trade-proof-card");
+
+if (tradeToggle && tradeProofCard) {
+    tradeToggle.addEventListener("click", () => {
+        const isVisible = tradeProofCard.classList.toggle("result-visible");
+        tradeToggle.setAttribute("aria-pressed", isVisible);
+        tradeToggle.innerHTML = isVisible
+            ? '<i class="fas fa-rotate-left"></i> Hide result'
+            : '<i class="fas fa-chart-line"></i> Show result';
+    });
+}
+
+document.querySelectorAll(".tradingview-widget-container").forEach(container => {
+    const widgetScript = document.createElement("script");
+    widgetScript.src = "https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js";
+    widgetScript.async = true;
+    widgetScript.innerHTML = JSON.stringify({
+        symbol: container.dataset.symbol,
+        width: "100%",
+        height: "100%",
+        locale: "en",
+        dateRange: "1D",
+        colorTheme: "dark",
+        isTransparent: true,
+        autosize: true,
+        largeChartUrl: ""
+    });
+    container.appendChild(widgetScript);
 });
