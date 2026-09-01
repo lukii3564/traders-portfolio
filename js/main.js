@@ -239,3 +239,85 @@ document.querySelectorAll(".tradingview-widget-container").forEach(container => 
     });
     container.appendChild(widgetScript);
 });
+
+const contactForm = document.querySelector(".contact-form");
+const successPopup = document.getElementById("successPopup");
+const closePopup = document.getElementById("closePopup");
+
+function closeSuccessPopup() {
+    successPopup.classList.remove("show");
+    successPopup.setAttribute("aria-hidden", "true");
+}
+
+function showSuccessPopup() {
+    successPopup.classList.add("show");
+    successPopup.setAttribute("aria-hidden", "false");
+    closePopup.focus();
+}
+
+if (contactForm && successPopup && closePopup) {
+contactForm.addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const submitButton = contactForm.querySelector(".contact-submit");
+    const originalText = submitButton.innerHTML;
+
+    submitButton.disabled = true;
+    submitButton.innerHTML = "Sending...";
+
+    try {
+        const formData = new FormData(contactForm);
+
+        const response = await fetch(contactForm.action, {
+            method: "POST",
+            body: formData,
+            headers: {
+                "Accept": "application/json"
+            }
+        });
+
+        // Formspree has received the submission
+        if (response.ok) {
+            contactForm.reset();
+
+            showSuccessPopup();
+        } else {
+            // Try to read Formspree's response
+            const data = await response.json().catch(() => null);
+
+            console.error("Formspree response:", data);
+
+            alert(
+                data?.errors?.[0]?.message ||
+                "Something went wrong. Please try again."
+            );
+        }
+
+    } catch (error) {
+        console.error("Form submission error:", error);
+
+        alert(
+            "Your message may have been sent, but the connection could not be confirmed."
+        );
+    }
+
+    submitButton.disabled = false;
+    submitButton.innerHTML = originalText;
+});
+
+closePopup.addEventListener("click", function () {
+    closeSuccessPopup();
+});
+
+successPopup.addEventListener("click", function (event) {
+    if (event.target === successPopup) {
+        closeSuccessPopup();
+    }
+});
+
+document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && successPopup.classList.contains("show")) {
+        closeSuccessPopup();
+    }
+});
+}
