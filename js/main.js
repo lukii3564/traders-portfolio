@@ -321,3 +321,27 @@ document.addEventListener("keydown", function (event) {
     }
 });
 }
+
+
+const subjectSelect = document.getElementById("subject");
+const courseTypeField = document.getElementById("courseTypeField");
+const courseTypeSelect = document.getElementById("course-type");
+
+courseTypeField.style.display = "none";
+
+subjectSelect.addEventListener("change", function () {
+
+    if (this.value === "course-enquiry") {
+
+        courseTypeField.style.display = "block";
+        courseTypeSelect.required = true;
+
+    } else {
+
+        courseTypeField.style.display = "none";
+        courseTypeSelect.required = false;
+        courseTypeSelect.value = "";
+
+    }
+
+});

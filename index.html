@@ -95,7 +95,7 @@
                 </div>
             </div>
             <div class="image-card">
-                <img src="https://i.pinimg.com/736x/e7/6e/29/e76e294e06bed638f3c2d3cdcf35ae32.jpg" alt="Trader">
+                <img src="https://i.pinimg.com/736x/43/c2/18/43c2180b79b2d7f4b781ddd534603cab.jpg" alt="Trader">
             </div>
         </div>
     </section>
@@ -454,16 +454,7 @@
             </article>
         </div>
 
-        <!-- <article class="proof-card monthly-chart-card">
-            <div class="proof-card-header">
-                <div><span class="eyebrow">Monthly performance</span><h3>Return history</h3></div>
-                <span class="chart-key"><i></i> Monthly return</span>
-            </div>
-            <div class="monthly-chart-wrap">
-                <canvas id="monthlyReturnsChart" aria-label="Monthly trading returns bar chart" role="img"></canvas>
-            </div>
-            <p class="chart-hint"><i class="fas fa-arrow-pointer"></i> Hover a bar to see equity growth, win rate and monthly profit.</p>
-        </article> -->
+      
 
         <article class="proof-card trade-proof-card">
             <div class="proof-card-header"><div><span class="eyebrow">Trade breakdown</span><h3>Before / after: XAUUSD long</h3></div><button class="trade-toggle" type="button" aria-pressed="false"><i class="fas fa-chart-line"></i> Show result</button></div>
@@ -711,16 +702,27 @@ A broker account and a charting platform (I'll point you to what I use) ETC
 
     </div>
 
-    <div class="form-field">
-        <label for="subject">What can I help with?</label>
+   <div class="form-field">
+    <label for="subject">What can I help with?</label>
 
-        <select id="subject" name="subject" required>
-            <option value="" selected disabled>Select a topic</option>
-            <option value="market-analysis">Market analysis</option>
-            <option value="partnership">Partnership</option>
-            <option value="general">General enquiry</option>
-        </select>
-    </div>
+    <select id="subject" name="subject" required>
+        <option value="" selected disabled>Select a topic</option>
+        <option value="course-enquiry">Course enrolment</option>
+        <option value="market-analysis">Market analysis</option>
+        <option value="partnership">Partnership</option>
+        <option value="general">General enquiry</option>
+    </select>
+</div>
+
+<div class="form-field" id="courseTypeField">
+    <label for="course-type">Which program are you interested in?</label>
+
+    <select id="course-type" name="course_type">
+        <option value="" selected disabled>Select a program</option>
+        <option value="children">Children's Trading Program</option>
+        <option value="adult">Adult Trading Program</option>
+    </select>
+</div>
 
     <div class="form-field">
         <label for="message">Your message</label>
