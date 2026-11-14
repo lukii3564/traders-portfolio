@@ -178,16 +178,21 @@ const equityLine = document.getElementById("equityLine");
 const equityArea = document.getElementById("equityArea");
 const equityDot = document.getElementById("equityDot");
 const equityReturn = document.getElementById("equityReturn");
+const metricReturn = document.getElementById("metricReturn");
+const metricPeriod = document.getElementById("metricPeriod");
+const rangeLabel = document.getElementById("rangeLabel");
 
-if (equityLine && equityArea && equityDot && equityReturn) {
+if (equityLine && equityArea && equityDot && equityReturn && metricReturn && metricPeriod && rangeLabel) {
     const chartData = {
-        "1M": { points: [132, 129, 136, 121, 126, 110, 115, 100, 105, 87, 78], return: "+6.7%" },
-        "3M": { points: [182, 170, 175, 151, 159, 129, 136, 112, 117, 82, 68], return: "+18.4%" },
-        "6M": { points: [205, 191, 198, 174, 180, 154, 165, 136, 143, 110, 121, 91, 97, 62], return: "+42.8%" }
+        "1M": { points: [132, 129, 136, 121, 126, 110, 115, 100, 105, 87, 78], return: "+6.7%", label: "Last month", period: "1-month performance" },
+        "3M": { points: [182, 170, 175, 151, 159, 129, 136, 112, 117, 82, 68], return: "+18.4%", label: "Last 3 months", period: "3-month performance" },
+        "6M": { points: [205, 191, 198, 174, 180, 154, 165, 136, 143, 110, 121, 91, 97, 62], return: "+42.8%", label: "Last 6 months", period: "6-month performance" },
+        "YTD": { points: [205, 191, 198, 174, 180, 154, 165, 136, 143, 110, 121, 91, 97, 62], return: "+42.8%", label: "Year to date", period: "YTD performance" }
     };
 
     const drawEquityChart = range => {
-        const points = chartData[range].points;
+        const data = chartData[range];
+        const points = data.points;
         const step = 640 / (points.length - 1);
         const line = points.map((y, index) => `${index ? "L" : "M"}${(index * step).toFixed(1)},${y}`).join(" ");
         const lastX = ((points.length - 1) * step).toFixed(1);
@@ -196,14 +201,31 @@ if (equityLine && equityArea && equityDot && equityReturn) {
         equityArea.setAttribute("d", `${line} L${lastX},235 L0,235 Z`);
         equityDot.setAttribute("cx", lastX);
         equityDot.setAttribute("cy", points[points.length - 1]);
-        equityReturn.textContent = chartData[range].return;
+        equityReturn.textContent = data.return;
+        rangeLabel.textContent = data.label;
+
+        [metricReturn, metricPeriod].forEach(element => {
+            element.classList.add("is-updating");
+            requestAnimationFrame(() => {
+                if (element === metricReturn) {
+                    element.textContent = data.return.slice(0, -1);
+                } else {
+                    element.textContent = data.period;
+                }
+                requestAnimationFrame(() => element.classList.remove("is-updating"));
+            });
+        });
     };
 
     drawEquityChart("3M");
     document.querySelectorAll(".chart-range button").forEach(button => {
         button.addEventListener("click", () => {
-            document.querySelectorAll(".chart-range button").forEach(item => item.classList.remove("active"));
+            document.querySelectorAll(".chart-range button").forEach(item => {
+                item.classList.remove("active");
+                item.setAttribute("aria-pressed", "false");
+            });
             button.classList.add("active");
+            button.setAttribute("aria-pressed", "true");
             drawEquityChart(button.dataset.range);
         });
     });
