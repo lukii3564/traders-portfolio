@@ -95,29 +95,149 @@
             #loader {
                 position: fixed;
                 inset: 0;
-                background: rgba(4, 9, 8, 0.97);
                 display: grid;
                 place-items: center;
+                overflow: hidden;
+                background: #050505;
+                opacity: 1;
+                transform: scale(1);
+                transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s linear 0.3s;
+                visibility: visible;
                 z-index: 99999;
-                transition: opacity 0.45s ease, visibility 0.45s ease;
             }
 
-            #loader.hidden {
+            #loader.is-exiting {
                 opacity: 0;
+                pointer-events: none;
+                transform: scale(1.05);
                 visibility: hidden;
+            }
+
+            #introCanvas {
+                position: absolute;
+                inset: 0;
+                width: 100%;
+                height: 100%;
+            }
+
+            .intro-lockup {
+                position: relative;
+                z-index: 1;
+                display: flex;
+                align-items: center;
+                gap: 1.25rem;
+                opacity: 0;
+                transform: translateY(8px) scale(0.96);
+                transition: opacity 0.18s ease, transform 0.18s ease;
                 pointer-events: none;
             }
 
-            .loader-logo {
-                font-size: clamp(2rem, 3vw, 3rem);
-                font-family: "Space Grotesk", sans-serif;
-                font-weight: 700;
-                letter-spacing: 0.04em;
-                color: var(--text-primary);
+            #loader.lockup-visible .intro-lockup {
+                opacity: 1;
+                transform: translateY(0) scale(1);
             }
 
-            .loader-logo span {
-                color: var(--secondary-accent);
+            .intro-emblem {
+                position: relative;
+                display: grid;
+                place-items: center;
+                width: 76px;
+                aspect-ratio: 1;
+                flex: 0 0 auto;
+                border: 2px solid #f1d889;
+                border-radius: 50%;
+                background: radial-gradient(circle at 32% 26%, #fff0b0, #c7932f 52%, #704711);
+                box-shadow: 0 0 28px rgba(212, 175, 55, 0.42), inset 0 0 0 4px rgba(87, 52, 8, 0.35);
+                color: #281906;
+                font-family: "Space Grotesk", sans-serif;
+                font-size: 1.7rem;
+                font-weight: 800;
+                letter-spacing: -0.08em;
+                text-shadow: 0 1px 0 rgba(255, 239, 177, 0.7);
+            }
+
+            .intro-emblem::after {
+                position: absolute;
+                inset: 5px;
+                border: 1px solid rgba(255, 244, 194, 0.72);
+                border-radius: inherit;
+                content: "";
+            }
+
+            .intro-brand-name {
+                margin: 0;
+                color: #f5f2e9;
+                font-family: "Space Grotesk", sans-serif;
+                font-size: clamp(1.8rem, 4vw, 3rem);
+                font-weight: 700;
+                letter-spacing: -0.045em;
+                line-height: 1.1;
+                white-space: nowrap;
+            }
+
+            .intro-subtitle {
+                margin: 0.55rem 0 0;
+                color: #c9b979;
+                font-size: 0.72rem;
+                font-weight: 600;
+                letter-spacing: 0.2em;
+                text-transform: uppercase;
+            }
+
+            .intro-skip {
+                position: absolute;
+                right: max(1.25rem, env(safe-area-inset-right));
+                bottom: max(1.25rem, env(safe-area-inset-bottom));
+                z-index: 2;
+                padding: 0.5rem 0.7rem;
+                border: 1px solid rgba(212, 175, 55, 0.24);
+                border-radius: 999px;
+                background: rgba(5, 5, 5, 0.45);
+                color: rgba(245, 242, 233, 0.58);
+                font-size: 0.78rem;
+                transition: color 0.2s ease, border-color 0.2s ease;
+            }
+
+            .intro-skip:hover,
+            .intro-skip:focus-visible {
+                border-color: rgba(212, 175, 55, 0.65);
+                color: #f5f2e9;
+            }
+
+            #loader.fast {
+                transition-duration: 0.25s;
+            }
+
+            #loader.fast .intro-lockup {
+                transition-duration: 0.25s;
+            }
+
+            #loader.reduced-motion {
+                transition-duration: 0.35s;
+            }
+
+            #loader.reduced-motion .intro-lockup {
+                transition-duration: 0.4s;
+            }
+
+            @media (max-width: 540px) {
+                .intro-lockup {
+                    gap: 0.8rem;
+                }
+
+                .intro-emblem {
+                    width: 58px;
+                    font-size: 1.35rem;
+                }
+
+                .intro-brand-name {
+                    font-size: clamp(1.35rem, 6vw, 2rem);
+                }
+
+                .intro-subtitle {
+                    font-size: 0.58rem;
+                    letter-spacing: 0.14em;
+                }
             }
 
             .site-header {
@@ -1646,14 +1766,27 @@
                     transition-duration: 0.01ms !important;
                     scroll-behavior: auto !important;
                 }
+
+                #loader.reduced-motion,
+                #loader.reduced-motion .intro-lockup {
+                    transition-duration: 0.4s !important;
+                }
             }
         </style>
     </head>
     <body>
         <a class="skip-link" href="#main-content">Skip to content</a>
 
-        <div id="loader" aria-live="polite" aria-label="Loading Deppa Trades KE website">
-            <div class="loader-logo"><span>Deppa</span> Trades KE</div>
+        <div id="loader" role="dialog" aria-modal="true" aria-labelledby="introTitle" tabindex="-1">
+            <canvas id="introCanvas" aria-hidden="true"></canvas>
+            <div class="intro-lockup">
+                <div class="intro-emblem" aria-hidden="true">DT</div>
+                <div>
+                    <h1 class="intro-brand-name" id="introTitle">Deppa Trades KE</h1>
+                    <p class="intro-subtitle">Professional Forex Trader</p>
+                </div>
+            </div>
+            <button class="intro-skip" id="introSkip" type="button">Skip Intro</button>
         </div>
 
         <header class="site-header">
@@ -2302,9 +2435,320 @@
             const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
             const loader = document.getElementById('loader');
-            window.addEventListener('load', () => {
-                setTimeout(() => loader.classList.add('hidden'), 550);
+            const introCanvas = document.getElementById('introCanvas');
+            const introSkip = document.getElementById('introSkip');
+            const introContext = introCanvas.getContext('2d');
+            const introPageContent = document.querySelectorAll('.skip-link, .site-header, #main-content, .footer, .wa-float');
+            const exitDuration = 300;
+            const gold = 'rgba(212, 175, 55, ';
+            const green = 'rgba(23, 196, 122, ';
+            const cyan = 'rgba(91, 220, 207, ';
+            const introParticles = [];
+            let introFrame = 0;
+            let introStartedAt = 0;
+            let introLastFrame = 0;
+            let introWidth = 0;
+            let introHeight = 0;
+            let introPixelRatio = 1;
+            let introFinished = false;
+            let introBurstStarted = false;
+
+            introPageContent.forEach((element) => {
+                element.inert = true;
             });
+
+            function resizeIntroCanvas() {
+                introPixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
+                introWidth = window.innerWidth;
+                introHeight = window.innerHeight;
+                introCanvas.width = Math.round(introWidth * introPixelRatio);
+                introCanvas.height = Math.round(introHeight * introPixelRatio);
+                introContext.setTransform(introPixelRatio, 0, 0, introPixelRatio, 0, 0);
+            }
+
+            function clamp(value, min, max) {
+                return Math.max(min, Math.min(max, value));
+            }
+
+            function easeOutCubic(value) {
+                return 1 - Math.pow(1 - value, 3);
+            }
+
+            function drawCoin(x, y, radius, rotation, alpha) {
+                const faceWidth = Math.max(0.12, Math.abs(Math.cos(rotation)));
+                const gradient = introContext.createLinearGradient(-radius, 0, radius, 0);
+                gradient.addColorStop(0, '#805719');
+                gradient.addColorStop(0.22, '#f4d87e');
+                gradient.addColorStop(0.52, '#c89432');
+                gradient.addColorStop(0.82, '#fbe9a6');
+                gradient.addColorStop(1, '#805719');
+
+                introContext.save();
+                introContext.globalAlpha = alpha;
+                introContext.translate(x, y);
+                introContext.shadowColor = 'rgba(232, 183, 63, 0.8)';
+                introContext.shadowBlur = 20;
+                introContext.beginPath();
+                introContext.ellipse(0, 0, radius * faceWidth, radius, 0, 0, Math.PI * 2);
+                introContext.fillStyle = gradient;
+                introContext.fill();
+                introContext.shadowBlur = 0;
+                introContext.lineWidth = Math.max(1, radius * 0.065);
+                introContext.strokeStyle = '#f9e6a3';
+                introContext.stroke();
+
+                if (faceWidth > 0.28) {
+                    introContext.save();
+                    introContext.scale(faceWidth, 1);
+                    introContext.beginPath();
+                    introContext.arc(0, 0, radius * 0.78, 0, Math.PI * 2);
+                    introContext.lineWidth = Math.max(1, radius * 0.035);
+                    introContext.strokeStyle = 'rgba(94, 60, 13, 0.72)';
+                    introContext.stroke();
+                    introContext.fillStyle = '#3d290d';
+                    introContext.textAlign = 'center';
+                    introContext.textBaseline = 'middle';
+                    introContext.font = `700 ${Math.max(8, radius * 0.48)}px "Space Grotesk", sans-serif`;
+                    introContext.fillText('DT', 0, -radius * 0.08);
+                    if (radius > 24) {
+                        introContext.font = `600 ${radius * 0.12}px Inter, sans-serif`;
+                        introContext.fillText('DEPPA TRADES KE', 0, radius * 0.42);
+                    }
+                    introContext.restore();
+                }
+                introContext.restore();
+            }
+
+            function createIntroBurst(centerX, centerY) {
+                const count = window.innerWidth < 768 ? 20 : 40;
+                const spread = Math.max(introWidth, introHeight);
+                const symbols = ['$', '€', '£'];
+
+                for (let index = 0; index < count; index += 1) {
+                    const angle = (Math.PI * 2 * index / count) + (Math.random() - 0.5) * 0.28;
+                    const speed = 2.4 + Math.random() * 3.4 + spread * 0.0016;
+                    const kindRoll = Math.random();
+                    introParticles.push({
+                        x: centerX,
+                        y: centerY,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed - 1.1,
+                        radius: 4 + Math.random() * 7,
+                        rotation: Math.random() * Math.PI * 2,
+                        spin: (Math.random() - 0.5) * 0.18,
+                        kind: kindRoll < 0.48 ? 'coin' : kindRoll < 0.68 ? 'candle' : kindRoll < 0.84 ? 'arrow' : 'currency',
+                        symbol: symbols[Math.floor(Math.random() * symbols.length)],
+                        color: Math.random() < 0.5 ? gold : cyan
+                    });
+                }
+            }
+
+            function drawParticle(particle, alpha) {
+                const { x, y, radius, kind } = particle;
+                introContext.save();
+                introContext.globalAlpha = alpha;
+                introContext.shadowColor = particle.color + '0.75)';
+                introContext.shadowBlur = 9;
+                introContext.strokeStyle = particle.color + '0.92)';
+                introContext.fillStyle = particle.color + '0.82)';
+                introContext.lineWidth = 1.4;
+
+                if (kind === 'coin') {
+                    const faceWidth = Math.max(0.18, Math.abs(Math.cos(particle.rotation)));
+                    introContext.beginPath();
+                    introContext.ellipse(x, y, radius * faceWidth, radius, 0, 0, Math.PI * 2);
+                    introContext.fillStyle = 'rgba(202, 151, 48, 0.9)';
+                    introContext.fill();
+                    introContext.strokeStyle = 'rgba(255, 225, 141, 0.95)';
+                    introContext.stroke();
+                    if (faceWidth > 0.45) {
+                        introContext.fillStyle = '#38270e';
+                        introContext.font = `700 ${radius}px "Space Grotesk", sans-serif`;
+                        introContext.textAlign = 'center';
+                        introContext.textBaseline = 'middle';
+                        introContext.fillText('D', x, y);
+                    }
+                } else if (kind === 'candle') {
+                    introContext.beginPath();
+                    introContext.moveTo(x, y - radius * 1.6);
+                    introContext.lineTo(x, y + radius * 1.6);
+                    introContext.moveTo(x - radius * 0.6, y - radius * 0.6);
+                    introContext.lineTo(x + radius * 0.6, y - radius * 0.6);
+                    introContext.moveTo(x - radius * 0.6, y + radius * 0.55);
+                    introContext.lineTo(x + radius * 0.6, y + radius * 0.55);
+                    introContext.stroke();
+                    introContext.fillRect(x - radius * 0.6, y - radius * 0.6, radius * 1.2, radius * 1.15);
+                } else if (kind === 'arrow') {
+                    introContext.beginPath();
+                    introContext.moveTo(x - radius, y + radius * 0.65);
+                    introContext.lineTo(x - radius * 0.1, y - radius * 0.1);
+                    introContext.lineTo(x + radius * 0.35, y + radius * 0.25);
+                    introContext.lineTo(x + radius, y - radius * 0.8);
+                    introContext.moveTo(x + radius * 0.22, y - radius * 0.8);
+                    introContext.lineTo(x + radius, y - radius * 0.8);
+                    introContext.lineTo(x + radius, y - radius * 0.02);
+                    introContext.stroke();
+                } else {
+                    introContext.fillStyle = particle.color + '0.95)';
+                    introContext.font = `700 ${radius * 2.1}px Georgia, serif`;
+                    introContext.textAlign = 'center';
+                    introContext.textBaseline = 'middle';
+                    introContext.fillText(particle.symbol, x, y);
+                }
+
+                introContext.restore();
+            }
+
+            function drawNetwork(elapsed, fade) {
+                const formation = clamp((elapsed - 1800) / 300, 0, 1);
+                const networkFade = formation * fade;
+                if (networkFade <= 0.01) return;
+
+                const maxDistance = Math.min(190, Math.max(105, introWidth * 0.16));
+                introContext.save();
+                for (let first = 0; first < introParticles.length; first += 1) {
+                    const point = introParticles[first];
+                    for (let second = first + 1; second < introParticles.length; second += 1) {
+                        const next = introParticles[second];
+                        const dx = next.x - point.x;
+                        const dy = next.y - point.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        if (distance < maxDistance) {
+                            const strength = (1 - distance / maxDistance) * 0.32 * networkFade;
+                            introContext.beginPath();
+                            introContext.moveTo(point.x, point.y);
+                            introContext.lineTo(next.x, next.y);
+                            introContext.strokeStyle = (first % 2 ? green : gold) + strength + ')';
+                            introContext.lineWidth = 0.8;
+                            introContext.stroke();
+                        }
+                    }
+                }
+                introContext.restore();
+            }
+
+            function stopIntroCanvas() {
+                cancelAnimationFrame(introFrame);
+                window.removeEventListener('resize', resizeIntroCanvas);
+                introCanvas.width = 0;
+                introCanvas.height = 0;
+                introCanvas.style.display = 'none';
+            }
+
+            function completeIntro() {
+                if (introFinished) return;
+                introFinished = true;
+                stopIntroCanvas();
+                introSkip.removeEventListener('click', completeIntro);
+                try {
+                    sessionStorage.setItem('deppa_intro_shown', 'true');
+                } catch (error) {
+                    console.warn('Unable to save the intro session flag:', error);
+                }
+
+                loader.classList.add('is-exiting');
+                window.setTimeout(() => {
+                    introPageContent.forEach((element) => {
+                        element.inert = false;
+                    });
+                    loader.remove();
+                }, exitDuration);
+            }
+
+            function renderIntro(timestamp) {
+                if (introFinished) return;
+                if (!introStartedAt) introStartedAt = timestamp;
+                const elapsed = timestamp - introStartedAt;
+                const deltaFrames = introLastFrame ? clamp((timestamp - introLastFrame) / 16.67, 0, 2) : 1;
+                introLastFrame = timestamp;
+                const centerX = introWidth / 2;
+                const centerY = introHeight / 2;
+                const coinRadius = clamp(introWidth * 0.04, 34, 54);
+
+                introContext.clearRect(0, 0, introWidth, introHeight);
+
+                if (elapsed < 1000) {
+                    const progress = easeOutCubic(elapsed / 1000);
+                    const startX = -coinRadius * 1.4;
+                    const x = startX + (centerX - startX) * progress;
+                    const travel = x - startX;
+                    const rotation = travel / (coinRadius * 2) * Math.PI * 2;
+                    for (let blur = 3; blur >= 1; blur -= 1) {
+                        drawCoin(x - blur * (2 + (1 - progress) * 4), centerY, coinRadius, rotation - blur * 0.1, 0.055 * (1 - progress));
+                    }
+                    drawCoin(x, centerY, coinRadius, rotation, 1);
+                } else {
+                    if (elapsed < 1230) {
+                        const pulse = 1 + Math.sin((elapsed - 1000) / 120 * Math.PI) * 0.16;
+                        const coinFade = 1 - clamp((elapsed - 1050) / 180, 0, 1);
+                        drawCoin(centerX, centerY, coinRadius * pulse, elapsed * 0.008, coinFade);
+                    }
+                    if (!introBurstStarted && elapsed >= 1050) {
+                        createIntroBurst(centerX, centerY);
+                        introBurstStarted = true;
+                    }
+
+                    if (introBurstStarted) {
+                        const shockwave = clamp((elapsed - 1050) / 360, 0, 1);
+                        if (shockwave < 1) {
+                            introContext.save();
+                            introContext.beginPath();
+                            introContext.arc(centerX, centerY, coinRadius * (0.4 + shockwave * 5), 0, Math.PI * 2);
+                            introContext.strokeStyle = gold + (0.42 * (1 - shockwave)) + ')';
+                            introContext.lineWidth = 2;
+                            introContext.shadowColor = 'rgba(232, 183, 63, 0.8)';
+                            introContext.shadowBlur = 18;
+                            introContext.stroke();
+                            introContext.restore();
+                        }
+
+                        const converge = clamp((elapsed - 2300) / 500, 0, 0.035);
+                        const particleFade = 1 - clamp((elapsed - 2450) / 400, 0, 1);
+                        introParticles.forEach((particle) => {
+                            particle.x += particle.vx * deltaFrames;
+                            particle.y += particle.vy * deltaFrames;
+                            particle.vy += 0.035 * deltaFrames;
+                            particle.vx *= Math.pow(0.994, deltaFrames);
+                            particle.vy *= Math.pow(0.994, deltaFrames);
+                            particle.rotation += particle.spin * deltaFrames;
+                            particle.x += (centerX - particle.x) * converge;
+                            particle.y += (centerY - particle.y) * converge;
+                        });
+                        drawNetwork(elapsed, particleFade);
+                        introParticles.forEach((particle) => {
+                            drawParticle(particle, particleFade);
+                        });
+                    }
+                }
+
+                if (elapsed >= 2500) loader.classList.add('lockup-visible');
+                if (elapsed >= 2900) {
+                    completeIntro();
+                    return;
+                }
+                introFrame = requestAnimationFrame(renderIntro);
+            }
+
+            introSkip.addEventListener('click', completeIntro);
+            resizeIntroCanvas();
+            window.addEventListener('resize', resizeIntroCanvas, { passive: true });
+
+            let introAlreadyShown = false;
+            try {
+                introAlreadyShown = sessionStorage.getItem('deppa_intro_shown') === 'true';
+            } catch (error) {
+                console.warn('Unable to read the intro session flag:', error);
+            }
+
+            if (prefersReducedMotion) {
+                loader.classList.add('reduced-motion', 'lockup-visible');
+                window.setTimeout(completeIntro, 600);
+            } else if (introAlreadyShown) {
+                loader.classList.add('fast', 'lockup-visible');
+                window.setTimeout(completeIntro, 250);
+            } else {
+                introFrame = requestAnimationFrame(renderIntro);
+            }
 
             const currentHour = new Date().getHours();
             const greeting = document.getElementById('greeting');
